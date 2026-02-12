@@ -11,7 +11,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.MultiValueMapAdapter;
@@ -25,27 +24,23 @@ import java.util.Optional;
 public class AuthService {
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public AuthService(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AuthService(UserRepository userRepository, SessionRepository sessionRepository) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     public ResponseEntity<UserDto> login(String email, String password) {
         Optional<User> userOptional = userRepository.findByEmail(email);
 
         if (userOptional.isEmpty()) {
-//            return this.signUp(email, password);
             return null;
         }
 
         User user = userOptional.get();
 
-        if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Wrong username password");
-//            return null;
+        if (!user.getPassword().equals(password)) {
+            return null;
         }
 
         String token = RandomStringUtils.randomAlphanumeric(30);
@@ -56,7 +51,7 @@ public class AuthService {
         session.setUser(user);
         sessionRepository.save(session);
 
-        UserDto userDto = UserDto.from(user);
+        UserDto userDto = new UserDto();
 
 //        Map<String, String> headers = new HashMap<>();
 //        headers.put(HttpHeaders.SET_COOKIE, token);
@@ -91,7 +86,7 @@ public class AuthService {
     public UserDto signUp(String email, String password) {
         User user = new User();
         user.setEmail(email);
-        user.setPassword(bCryptPasswordEncoder.encode(password));
+        user.setPassword(password);
         
         User savedUser = userRepository.save(user);
 
