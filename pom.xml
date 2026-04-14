@@ -80,10 +80,7 @@
             <version>0.13.0</version>
             <scope>runtime</scope>
         </dependency>
-<<<<<<< HEAD
 
-=======
->>>>>>> detached
     </dependencies>
 
     <build>
