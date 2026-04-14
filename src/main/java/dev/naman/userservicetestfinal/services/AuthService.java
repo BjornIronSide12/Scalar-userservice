@@ -6,8 +6,6 @@ import dev.naman.userservicetestfinal.models.SessionStatus;
 import dev.naman.userservicetestfinal.models.User;
 import dev.naman.userservicetestfinal.repositories.SessionRepository;
 import dev.naman.userservicetestfinal.repositories.UserRepository;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.security.MacAlgorithm;
@@ -20,7 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMapAdapter;
 
 import javax.crypto.SecretKey;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -32,7 +36,7 @@ public class AuthService {
     @Value("${jwt.expiration}")
     private String jwtExpiration;
 
-    public AuthService(UserRepository userRepository, SessionRepository sessionRepository,  BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public AuthService(UserRepository userRepository, SessionRepository sessionRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
@@ -48,7 +52,8 @@ public class AuthService {
         User user = userOptional.get();
 
         if (!bCryptPasswordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Wrong password");
+            throw new RuntimeException("Wrong username password");
+//            return null;
         }
 
         String token;
@@ -131,8 +136,12 @@ public class AuthService {
             return SessionStatus.ENDED;
         }
 
-        Jwt<JwsHeader, Claims> claimsJwt = Jwts.parser()
-                .build().parseSignedClaims(token);
+
+        Jwts.parser()
+                .build();
+
+
+//        if (!session.)
 
         return SessionStatus.ACTIVE;
     }
